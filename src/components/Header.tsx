@@ -9,7 +9,7 @@ const Header = () => {
         
         {/* Subtitle */}
         <p className="text-muted-foreground text-sm md:text-base">
-          Spécialiste des accessoires de rideaux et tringles
+          Spécialistes dans la vente et l'installation de rideaux sur mesure
         </p>
       </div>
     </header>;
