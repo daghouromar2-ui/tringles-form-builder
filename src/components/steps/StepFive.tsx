@@ -1,4 +1,7 @@
-import { CheckCircle, MapPin, Grid3X3, Clock, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CheckCircle, MapPin, Grid3X3, Clock, User, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface FormData {
   wilaya: string;
@@ -16,6 +19,48 @@ interface StepFiveProps {
 }
 
 const StepFive = ({ formData }: StepFiveProps) => {
+  const [isSubmitting, setIsSubmitting] = useState(true);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  useEffect(() => {
+    const submitBooking = async () => {
+      try {
+        const { error } = await supabase.from("bookings").insert({
+          wilaya: formData.wilaya,
+          window_count: parseInt(formData.windowCount),
+          installation_time: formData.installationTime,
+          full_name: formData.contactInfo.fullName,
+          phone: formData.contactInfo.phone,
+          address: formData.contactInfo.address,
+        });
+
+        if (error) {
+          console.error("Error submitting booking:", error);
+          toast.error("Une erreur s'est produite. Veuillez réessayer.");
+        } else {
+          setIsSubmitted(true);
+          toast.success("Votre demande a été envoyée avec succès !");
+        }
+      } catch (err) {
+        console.error("Error submitting booking:", err);
+        toast.error("Une erreur s'est produite. Veuillez réessayer.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    };
+
+    submitBooking();
+  }, [formData]);
+
+  if (isSubmitting) {
+    return (
+      <div className="animate-slide-in text-center py-12">
+        <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+        <p className="text-muted-foreground">Envoi de votre demande...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="animate-slide-in text-center">
       {/* Success Icon */}
