@@ -1,6 +1,7 @@
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import BookingForm from "@/components/BookingForm";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+
 
 const Index = () => {
   return (

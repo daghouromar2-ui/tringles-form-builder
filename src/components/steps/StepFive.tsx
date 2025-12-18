@@ -22,35 +22,41 @@ const StepFive = ({ formData }: StepFiveProps) => {
   const [isSubmitting, setIsSubmitting] = useState(true);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+
+
   useEffect(() => {
-    const submitBooking = async () => {
-      try {
-        const { error } = await supabase.from("bookings").insert({
-          wilaya: formData.wilaya,
-          window_count: parseInt(formData.windowCount),
-          installation_time: formData.installationTime,
-          full_name: formData.contactInfo.fullName,
+  const submitBooking = async () => {
+    try {
+      const res = await fetch("http://localhost:4000/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: formData.contactInfo.fullName,
           phone: formData.contactInfo.phone,
+          wilaya: formData.wilaya,
+          windowCount: formData.windowCount,
+          installationTime: formData.installationTime,
           address: formData.contactInfo.address,
-        });
+        }),
+      });
 
-        if (error) {
-          console.error("Error submitting booking:", error);
-          toast.error("Une erreur s'est produite. Veuillez réessayer.");
-        } else {
-          setIsSubmitted(true);
-          toast.success("Votre demande a été envoyée avec succès !");
-        }
-      } catch (err) {
-        console.error("Error submitting booking:", err);
-        toast.error("Une erreur s'est produite. Veuillez réessayer.");
-      } finally {
-        setIsSubmitting(false);
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error || "Request failed");
       }
-    };
 
-    submitBooking();
-  }, [formData]);
+      setIsSubmitted(true);
+      toast.success("Votre demande a été envoyée avec succès !");
+    } catch (err) {
+      console.error("Error submitting booking:", err);
+      toast.error("Une erreur s'est produite. Veuillez réessayer.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  submitBooking();
+}, [formData]);
 
   if (isSubmitting) {
     return (
