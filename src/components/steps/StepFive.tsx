@@ -27,7 +27,7 @@ const StepFive = ({ formData }: StepFiveProps) => {
   useEffect(() => {
   const submitBooking = async () => {
     try {
-      const res = await fetch("http://localhost:4000/booking", {
+      const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
