@@ -6,14 +6,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    const auth = new google.auth.JWT({
-      email: process.env.GOOGLE_CLIENT_EMAIL,
-      key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-    });
-
-    const sheets = google.sheets({ version: "v4", auth });
-
     const {
       fullName,
       phone,
@@ -23,9 +15,17 @@ export default async function handler(req, res) {
       address,
     } = req.body;
 
-    const submittedAt = new Date().toLocaleString("fr-FR", {
-      timeZone: "Africa/Algiers",
+    const submittedAt = new Date().toLocaleString("fr-FR", {timeZone: "Africa/Algiers"});
+
+    const auth = new google.auth.JWT({
+      email: process.env.GOOGLE_CLIENT_EMAIL,
+      key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      scopes: ["https://www.googleapis.com/auth/spreadsheets"],
     });
+
+    await auth.authorize(); // ✅ INSIDE HANDLER
+
+    const sheets = google.sheets({ version: "v4", auth });
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: process.env.SHEET_ID,
@@ -46,7 +46,7 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ success: true });
   } catch (err) {
-    console.error("BOOKING API ERROR:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    console.error("❌ BOOKING ERROR:", err);
+    return res.status(500).json({ error: "Booking failed" });
   }
 }
